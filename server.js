@@ -40,6 +40,10 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files (logos)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve frontend static files
+const frontendPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendPath));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -60,6 +64,14 @@ app.use('/api/users', userRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// SPA fallback - rediriger toutes les routes non-API vers index.html
+app.get('*', (req, res) => {
+  // Vérifie que ce n'est pas une route API ou un fichier statique
+  if (!req.path.startsWith('/api') && !req.path.includes('.')) {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  }
 });
 
 // Error handling middleware
