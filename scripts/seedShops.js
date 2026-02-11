@@ -38,7 +38,7 @@ const shops = [
 const seedShops = async () => {
   try {
     // Connect to MongoDB
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/commerce_db';
+    const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Bahamadoutidiane622292370:Bahsow64@cluster0.niqycgy.mongodb.net/commerce_db';
     console.log('🔄 Connexion à MongoDB...');
     await mongoose.connect(mongoURI);
     console.log('✅ MongoDB connecté');
@@ -62,7 +62,7 @@ const seedShops = async () => {
     // Create shops
     console.log('\n📦 Création des boutiques...');
     const createdShops = await Shop.insertMany(shops);
-    
+
     console.log(`\n✅ ${createdShops.length} boutique(s) créée(s) avec succès !\n`);
     createdShops.forEach((shop, index) => {
       console.log(`${index + 1}. ${shop.nom}`);

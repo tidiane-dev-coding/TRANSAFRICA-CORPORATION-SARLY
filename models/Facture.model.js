@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const factureSchema = new mongoose.Schema({
   numero: {
     type: String,
-    unique: true,
     required: true
   },
   client: {
@@ -76,8 +75,8 @@ const factureSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index
-factureSchema.index({ numero: 1 });
+// Indexes - combination of numero and shop (no longer unique to avoid hard crashes)
+factureSchema.index({ numero: 1, shop: 1 });
 factureSchema.index({ client: 1, createdAt: -1 });
 factureSchema.index({ statut: 1 });
 

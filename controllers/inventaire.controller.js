@@ -39,7 +39,14 @@ export const getInventaires = async (req, res) => {
 // @access  Private
 export const getInventaire = async (req, res) => {
   try {
-    const inventaire = await Inventaire.findOne({ _id: req.params.id, ...req.shopFilter })
+    let query = { _id: req.params.id };
+    
+    // If not admin or if admin didn't specify a shop, allow access to any shop
+    if (req.user.role !== 'admin' || req.query.shopId) {
+      query = { _id: req.params.id, ...req.shopFilter };
+    }
+    
+    const inventaire = await Inventaire.findOne(query)
       .populate('produits.product', 'nom categorie prixAchat')
       .populate('createdBy', 'nom');
 
@@ -135,6 +142,106 @@ export const createInventaire = async (req, res) => {
     res.status(400).json({
       success: false,
       message: 'Erreur lors de la création de l\'inventaire',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Update inventaire
+// @route   PUT /api/inventaire/:id
+// @access  Private (Admin only)
+export const updateInventaire = async (req, res) => {
+  try {
+    const { produits, dateInventaire, notes } = req.body;
+    
+    let inventaire = await Inventaire.findById(req.params.id);
+    
+    if (!inventaire) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventaire non trouvé'
+      });
+    }
+
+    // Get shop ID
+    const shopId = inventaire.shop;
+    const produitsData = [];
+    let valeurTotale = 0;
+
+    // Update products data if provided
+    if (produits && produits.length > 0) {
+      for (const item of produits) {
+        const product = await Product.findOne({ _id: item.product, shop: shopId });
+        if (!product) {
+          return res.status(404).json({
+            success: false,
+            message: `Produit ${item.product} non trouvé`
+          });
+        }
+
+        const ecart = item.stockReel - item.stockTheorique;
+        const valeurStock = item.stockReel * product.prixAchat;
+        valeurTotale += valeurStock;
+
+        produitsData.push({
+          product: item.product,
+          stockTheorique: item.stockTheorique,
+          stockReel: item.stockReel,
+          ecart,
+          valeurStock
+        });
+      }
+
+      inventaire.produits = produitsData;
+      inventaire.valeurTotale = valeurTotale;
+    }
+
+    if (dateInventaire) inventaire.dateInventaire = dateInventaire;
+    if (notes !== undefined) inventaire.notes = notes;
+
+    await inventaire.save();
+
+    const updatedInventaire = await Inventaire.findById(inventaire._id)
+      .populate('produits.product', 'nom categorie prixAchat')
+      .populate('createdBy', 'nom');
+
+    res.json({
+      success: true,
+      data: updatedInventaire
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: 'Erreur lors de la modification de l\'inventaire',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Delete inventaire
+// @route   DELETE /api/inventaire/:id
+// @access  Private (Admin only)
+export const deleteInventaire = async (req, res) => {
+  try {
+    const inventaire = await Inventaire.findById(req.params.id);
+    
+    if (!inventaire) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventaire non trouvé'
+      });
+    }
+
+    await Inventaire.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true,
+      message: 'Inventaire supprimé avec succès'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la suppression de l\'inventaire',
       error: error.message
     });
   }

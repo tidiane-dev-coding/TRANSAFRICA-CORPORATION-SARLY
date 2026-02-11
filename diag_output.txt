@@ -1,0 +1,48 @@
+
+🔍 Checking FactureSequence for Shop: 69658754d60b265b857f15f3, Year: 2026
+FactureSequence: {
+  "_id": "698c7a38726063b89f8c4462",
+  "shop": "69658754d60b265b857f15f3",
+  "year": 2026,
+  "__v": 0,
+  "count": 79,
+  "createdAt": "2026-02-11T12:46:48.362Z",
+  "updatedAt": "2026-02-11T13:13:17.009Z"
+}
+
+🔍 Checking Factures for Shop: 69658754d60b265b857f15f3 starting with FACT-2026-
+Found 30 recent factures:
+  - FACT-2026-0079 (ID: 698a0e054f0b0c795bbab1db, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0073 (ID: 698a0f464f0b0c795bbab6b8, Date: Sat Feb 07 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0071 (ID: 698a0c3a4f0b0c795bbaab4b, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0069 (ID: 698a03c0bdcd6977249f730e, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0068 (ID: 698a0336bdcd6977249f7183, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0067 (ID: 698a0292bdcd6977249f6f67, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0066 (ID: 698a016ebdcd6977249f6de2, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0065 (ID: 69862ca639c45e6d5b2087bf, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0064 (ID: 69862b9c39c45e6d5b2085c1, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0063 (ID: 69862a7039c45e6d5b2083be, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0062 (ID: 6986298839c45e6d5b208245, Date: Thu Feb 05 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0061 (ID: 698628b039c45e6d5b2080c6, Date: Thu Feb 05 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0060 (ID: 698627b039c45e6d5b207fce, Date: Thu Feb 05 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0059 (ID: 6986268739c45e6d5b207de4, Date: Thu Feb 05 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0058 (ID: 698625d439c45e6d5b207c72, Date: Wed Feb 04 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0057 (ID: 6986254c39c45e6d5b207a5f, Date: Wed Feb 04 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0056 (ID: 6986244339c45e6d5b207970, Date: Wed Feb 04 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0055 (ID: 698622be39c45e6d5b207812, Date: Wed Feb 04 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0054 (ID: 6986206239c45e6d5b2075c7, Date: Fri Feb 06 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0053 (ID: 69823cad5a815bf1ee5ecfce, Date: Tue Feb 03 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0052 (ID: 69823baa5a815bf1ee5ece70, Date: Sat Jan 31 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0051 (ID: 69823b1a5a815bf1ee5ecd16, Date: Tue Feb 03 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0050 (ID: 698239f25a815bf1ee5ecbc1, Date: Tue Feb 03 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0049 (ID: 6982387c5a815bf1ee5ec98d, Date: Mon Feb 02 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0048 (ID: 698236e85a815bf1ee5ec770, Date: Tue Feb 03 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0047 (ID: 698236895a815bf1ee5ec69b, Date: Mon Feb 02 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0046 (ID: 698235105a815bf1ee5ec4c5, Date: Tue Feb 03 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0045 (ID: 698234905a815bf1ee5ec3ec, Date: Sun Feb 01 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0044 (ID: 6982335f5a815bf1ee5ec2b4, Date: Sun Feb 01 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+  - FACT-2026-0043 (ID: 698232dc5a815bf1ee5ec1eb, Date: Sun Feb 01 2026 00:00:00 GMT+0000 (heure moyenne de Greenwich))
+
+Presence check:
+- FACT-2026-0073: EXISTS
+- FACT-2026-00073: NO

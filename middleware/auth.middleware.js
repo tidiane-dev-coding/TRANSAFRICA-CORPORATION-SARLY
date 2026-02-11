@@ -34,7 +34,7 @@ export const protect = async (req, res, next) => {
       
       // Set shop filter for queries
       if (req.user.role === 'admin') {
-        // Admin can see all shops, but can filter by shopId in query params
+        // Admin can see all shops or filter by shopId if provided
         req.shopFilter = req.query.shopId ? { shop: req.query.shopId } : {};
       } else {
         // Employee can only see their shop

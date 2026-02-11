@@ -73,11 +73,35 @@ export const getFacture = async (req, res) => {
   }
 };
 
+// Helper to compute next invoice number directly from existing factures
+const computeNextFactureNumeroFromDB = async (shopId) => {
+  const year = new Date().getFullYear();
+  const regex = new RegExp(`^FACT-${year}-`);
+
+  // Get last facture for this shop/year ordered by numero desc
+  const lastFacture = await Facture.findOne({
+    shop: shopId,
+    numero: regex
+  }).sort({ numero: -1 }).select('numero').lean();
+
+  let nextCount = 1;
+  if (lastFacture && lastFacture.numero) {
+    const parts = lastFacture.numero.split('-');
+    const current = parseInt(parts[2], 10);
+    if (!isNaN(current)) {
+      nextCount = current + 1;
+    }
+  }
+
+  return `FACT-${year}-${String(nextCount).padStart(6, '0')}`;
+};
+
 // @desc    Create facture
 // @route   POST /api/factures
 // @access  Private
 export const createFacture = async (req, res) => {
   try {
+    console.log('Creating facture...');
     const { client, articles, dateFacture, dateEcheance, notes } = req.body;
 
     // Set shop from user's shop or from request
@@ -178,21 +202,53 @@ export const createFacture = async (req, res) => {
       });
     }
 
-    // Generate invoice number
-    const numero = await generateFactureNumero(Facture);
+    // Create facture with retry logic in case of duplicate numero (E11000)
+    let facture;
+    let numero;
+    const maxAttempts = 5;
 
-    // Create facture
-    const facture = await Facture.create({
-      numero,
-      shop: shopId,
-      client,
-      articles: articlesData,
-      montantTotal,
-      dateFacture: dateFacture || new Date(),
-      dateEcheance,
-      notes,
-      createdBy: req.user._id
-    });
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      // On premier essai, on utilise le générateur basé sur la séquence.
+      // Si on a déjà eu des conflits, on recalcule le prochain numéro directement depuis la base.
+      if (attempt === 1) {
+        numero = await generateFactureNumero(Facture, shopId);
+      } else {
+        numero = await computeNextFactureNumeroFromDB(shopId);
+      }
+
+      console.log(`[CONTROLLER] Attempt ${attempt} - numero to be used: ${numero}`);
+
+      try {
+        facture = await Facture.create({
+          numero,
+          shop: shopId,
+          client,
+          articles: articlesData,
+          montantTotal,
+          dateFacture: dateFacture || new Date(),
+          dateEcheance,
+          notes,
+          createdBy: req.user._id
+        });
+        break;
+      } catch (err) {
+        if (err.code === 11000) {
+          console.warn(`[CONTROLLER] Duplicate numero detected (${numero}), retrying...`);
+          // Try again with a new numero
+          continue;
+        }
+        // Any other error should bubble up
+        throw err;
+      }
+    }
+
+    if (!facture) {
+      return res.status(400).json({
+        success: false,
+        message: 'Impossible de générer un numéro de facture unique. Veuillez réessayer.',
+        error: 'DUPLICATE_NUMERO'
+      });
+    }
 
     // Update stock (create stock movements)
     for (const article of articlesData) {
@@ -254,7 +310,7 @@ export const updateFacturePayment = async (req, res) => {
     }
 
     const newMontantPaye = facture.montantPaye + montantPaye;
-    
+
     if (newMontantPaye > facture.montantTotal) {
       return res.status(400).json({
         success: false,
