@@ -24,6 +24,12 @@ const paiementFournisseurSchema = new mongoose.Schema({
     enum: ['especes', 'cheque', 'virement', 'carte'],
     default: 'especes'
   },
+  /** intégral = tout payé d’un coup, partiel = une partie, avance = paiement avant livraison / en avance */
+  typePaiement: {
+    type: String,
+    enum: ['integral', 'partiel', 'avance'],
+    default: 'partiel'
+  },
   notes: {
     type: String,
     trim: true

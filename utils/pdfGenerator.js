@@ -366,6 +366,131 @@ export const generateFacturePDF = (facture, client, user, boutiqueName = null, s
   });
 };
 
+// Generate PDF for fournisseur fourniture (réception/achat fournisseur)
+export const generateFournitureFournisseurPDF = (fourniture, fournisseur, user, boutiqueName = null, settings = null) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({
+        size: 'A4',
+        margin: 0,
+        info: {
+          Title: `Fourniture ${fourniture.numero}`,
+          Author: 'Gestion Commerciale',
+          Subject: 'Fourniture Fournisseur',
+        }
+      });
+
+      const chunks = [];
+      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', reject);
+
+      doc.page.margins = { top: 0, bottom: 50, left: 50, right: 50 };
+
+      const boutiqueNameToUse = boutiqueName || process.env.BOUTIQUE_NAME || 'Gestion Commerciale';
+      const headerEndY = drawHeader(
+        doc,
+        'FOURNITURE FOURNISSEUR',
+        fourniture.numero,
+        new Date(fourniture.dateFourniture || fourniture.createdAt || Date.now()).toLocaleDateString('fr-FR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }),
+        boutiqueNameToUse
+      );
+
+      let currentY = headerEndY;
+      if (settings && (settings.adresse || settings.telephone || settings.email || settings.ville)) {
+        currentY = drawInfoBox(doc, 'INFORMATIONS BOUTIQUE', {
+          nom: boutiqueNameToUse,
+          adresse: settings.adresse,
+          ville: settings.ville,
+          codePostal: settings.codePostal,
+          telephone: settings.telephone,
+          email: settings.email
+        }, headerEndY);
+        currentY += 5;
+      }
+
+      const fournisseurY = drawInfoBox(doc, 'INFORMATIONS FOURNISSEUR', {
+        nom: fournisseur.nom,
+        adresse: fournisseur.adresse,
+        ville: fournisseur.ville,
+        codePostal: fournisseur.codePostal,
+        telephone: fournisseur.telephone,
+        email: fournisseur.email
+      }, currentY);
+
+      // Articles table
+      doc.fontSize(10)
+        .fillColor('#1e40af')
+        .font('Helvetica-Bold')
+        .text('DÉTAIL DES ARTICLES', 50, fournisseurY);
+
+      const tableHeaders = ['Désignation', 'Qté', 'Prix unit.', 'Montant'];
+      const tableRows = (fourniture.articles || []).map(a => [
+        a.designation || '',
+        (a.quantite ?? '').toString(),
+        `${formatCurrency(a.prixUnitaire || 0)} GNF`,
+        `${formatCurrency(a.montant || 0)} GNF`
+      ]);
+
+      let tableEndY = drawTable(doc, tableHeaders, tableRows, fournisseurY + 15);
+
+      // Totals box
+      const totalsX = 350;
+      const totalsHeight = 60;
+      doc.rect(totalsX, tableEndY - 3, 200, totalsHeight)
+        .fillColor('#f3f4f6')
+        .fill()
+        .fillColor('#000000');
+
+      doc.fontSize(9).fillColor('#6b7280').text('TOTAL ARTICLES', totalsX + 10, tableEndY);
+      doc.fontSize(10).fillColor('#000000').font('Helvetica-Bold')
+        .text(`${formatCurrency(fourniture.montantTotal || 0)} GNF`, totalsX + 10, tableEndY + 10, { align: 'right', width: 180 });
+
+      doc.fontSize(9).fillColor('#6b7280').font('Helvetica')
+        .text('DOUANE', totalsX + 10, tableEndY + 22);
+      doc.fontSize(10).fillColor('#000000').font('Helvetica-Bold')
+        .text(`${formatCurrency(fourniture.prixDouaniere || 0)} GNF`, totalsX + 10, tableEndY + 32, { align: 'right', width: 180 });
+
+      doc.fontSize(9).fillColor('#6b7280').font('Helvetica')
+        .text('TOTAL GÉNÉRAL', totalsX + 10, tableEndY + 42);
+      doc.fontSize(11).fillColor('#1e40af').font('Helvetica-Bold')
+        .text(`${formatCurrency(fourniture.montantTotalAvecDouane || 0)} GNF`, totalsX + 10, tableEndY + 52, { align: 'right', width: 180 });
+
+      currentY = tableEndY + totalsHeight + 10;
+
+      // Mode fourniture
+      if (fourniture.modeFourniture && currentY < 760) {
+        doc.fontSize(9).fillColor('#6b7280').font('Helvetica').text('Mode:', 50, currentY);
+        doc.fontSize(10).fillColor('#000000').font('Helvetica-Bold').text(fourniture.modeFourniture, 120, currentY);
+        currentY += 18;
+      }
+
+      // Notes
+      if (fourniture.notes && currentY < 750) {
+        doc.fillColor('#000000').fontSize(9).font('Helvetica-Bold').text('NOTES:', 50, currentY);
+        const notesText = fourniture.notes.length > 140 ? fourniture.notes.substring(0, 140) + '...' : fourniture.notes;
+        doc.font('Helvetica').fillColor('#4b5563').fontSize(8).text(notesText, 50, currentY + 12, { width: 450 });
+        currentY += 30;
+      }
+
+      // Footer
+      const pageHeight = doc.page.height;
+      doc.moveTo(50, pageHeight - 40).lineTo(550, pageHeight - 40).strokeColor('#e5e7eb').stroke();
+      doc.fontSize(7).fillColor('#6b7280').font('Helvetica')
+        .text(`Document généré électroniquement - ${boutiqueNameToUse}`, 50, pageHeight - 32, { align: 'center', width: 500 });
+      doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} par ${user?.nom || 'Système'}`, 50, pageHeight - 25, { align: 'center', width: 500 });
+
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // Generate PDF for bon de commande
 export const generateBonCommandePDF = (bonCommande, fournisseur, user, boutiqueName = null, settings = null) => {
   return new Promise((resolve, reject) => {
